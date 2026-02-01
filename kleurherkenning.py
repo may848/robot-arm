@@ -38,7 +38,7 @@ while True:
     hue_value = pixel_center[0]
 
     color = "undefined"
-    if hue_value < 22:
+    if hue_value < 35:
         color = "rood"
     elif hue_value < 75:
         color = "groen"
@@ -69,4 +69,5 @@ cv2.destroyAllWindows()
   #  serialInst.write(command.encode('utf-8'))
 
    # if command == 'exit':
+
     #   exit()
