@@ -1,0 +1,64 @@
+import cv2
+import serial.tools.list_ports
+import time
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+ports = serial.tools.list_ports.comports()
+serialInst = serial.Serial()
+portsList = []
+
+for one in ports:
+    portsList.append(str(one))
+    print(str(one))
+
+com = input("Select Com Port for Arduino #: ")
+
+for i in range(len(portsList)):
+    if portsList[i].startswith("COM" + str(com)):
+        use = "COM" + str(com)
+        print(use)
+
+
+serialInst.baudrate = 9600
+serialInst.port = use
+serialInst.open()
+
+while True:
+    _, frame = cap.read()
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    height, width, _ = frame.shape
+
+    cx = int(width/2)
+    cy = int(height/2)
+
+    pixel_center = frame[cx, cy]
+    hue_value = pixel_center[0]
+
+    color = "undefined"
+    if hue_value < 22:
+        color = "rood"
+    elif hue_value < 75:
+        color = "groen"
+    elif hue_value < 141:
+        color = "blauw"
+    command = input("color")
+    serialInst.write(command.encode('utf-8'))
+    time.sleep(3)
+
+    print(color)
+    cv2.putText(frame, color, (10, 50), 0, 1, (255, 0, 0), 2)
+    cv2.circle(frame, (cx, cy), 5, (255, 0, 0), 3)
+
+
+
+    cv2.imshow('Frame', frame)
+    key =cv2.waitKey(1)
+    if key == 27:
+        break
+
+
+cap.release()
+cv2.destroyAllWindows()
